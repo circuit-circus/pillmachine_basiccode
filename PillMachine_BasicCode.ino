@@ -37,7 +37,7 @@ static uint8_t myip[] = {  10, 0, 0, 100 };
 IPAddress pc_server(10,0,0,31);  // serverens adress
 
 boolean cardPresent = false; // DEBUG: Set this and isDebugging to true to test UI
-boolean isDebugging = true; // DEBUG: Set this and cardPresent to true to test UI
+boolean isDebugging = false; // DEBUG: Set this and cardPresent to true to test UI
 boolean cardPresent_old = false;
 String cardID = ""; // NB skal muligvis laves til char-array for at spare memory
 String cardID_old = "";
