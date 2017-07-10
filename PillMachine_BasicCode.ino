@@ -41,10 +41,21 @@ boolean cardPresent_old = false;
 String cardID = ""; // NB skal muligvis laves til char-array for at spare memory
 String cardID_old = "";
 
-String   userval ="";
+String userval ="";
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 EthernetClient client;
+
+// Define machine individual variables here
+
+#define LATCH_PIN 2 // Latch pin for Shift Registers
+#define CLOCK_PIN 3 // Clock pin for Shift Registers
+#define DATA_PIN 4 // Data pin for Shift Registers
+
+// Setting bytes to non-zero makes debugging easier
+byte switchVar1 = 72;  //01001000
+byte switchVar2 = 159; //10011111
+byte switchVar3 = 98;  //01100010
 
 void setup() {
   Serial.begin(9600);
@@ -54,6 +65,11 @@ void setup() {
   Ethernet.begin(mac, myip);
   delay(5000); // wait for ethernetcard
   aktivateEthernetSPI(false);
+
+  // Machine individual setups go here
+  pinMode(LATCH_PIN, OUTPUT);
+  pinMode(CLOCK_PIN, OUTPUT);
+  pinMode(DATA_PIN, INPUT);
 }
 
 void loop() {
@@ -154,5 +170,51 @@ void UI() {
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
 
+  digitalWrite(LATCH_PIN,1);
+  delayMicroseconds(20);
+  digitalWrite(LATCH_PIN,0);
+
+  // Read the bits of the shift registers 8 at a time
+  // and load into bytes
+  switchVar1 = shiftIn(DATA_PIN, CLOCK_PIN);
+  switchVar2 = shiftIn(DATA_PIN, CLOCK_PIN);
+  switchVar3 = shiftIn(DATA_PIN, CLOCK_PIN);
+
+  Serial.println(switchVar1, BIN);
+  Serial.println(switchVar2, BIN);
+  Serial.println(switchVar3, BIN);
+
+  Serial.println("-------------------");
+  delay(500);
+
   userval="28,96,57,70";
+}
+
+// Custom functions for individual machines go here
+byte shiftIn(int myDataPin, int myClockPin) { 
+  int i;
+  int temp = 0;
+  int pinState;
+  byte myDataIn = 0;
+
+  pinMode(myClockPin, OUTPUT);
+  pinMode(myDataPin, INPUT);
+
+  for (i=7; i>=0; i--)
+  {
+    digitalWrite(myClockPin, 0);
+    delayMicroseconds(2);
+    temp = digitalRead(myDataPin);
+    if (temp) {
+      pinState = 1;
+      //set the bit to 0 no matter what
+      myDataIn = myDataIn | (1 << i);
+    }
+    else {
+      pinState = 0;
+    }
+
+    digitalWrite(myClockPin, 1);
+  }
+  return myDataIn;
 }
