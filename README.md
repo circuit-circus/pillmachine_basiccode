@@ -20,4 +20,4 @@ If you don't have an RFID reader and/or Ethernet Shield available, you can set `
 
 ## Example
 
-See the branch named `example` for more info.
+The branch named `example` is... well... an example of how this works.
