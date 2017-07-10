@@ -47,6 +47,8 @@ String   userval ="";
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 EthernetClient client;
 
+// Define machine individual variables here
+
 void setup() {
   Serial.begin(9600);
   SPI.begin();
@@ -55,6 +57,8 @@ void setup() {
   Ethernet.begin(mac, myip);
   delay(5000); // wait for ethernetcard
   aktivateEthernetSPI(false);
+
+  // Machine individual setups go here
 }
 
 void loop() {
@@ -157,3 +161,5 @@ void UI() {
 
   userval="28,96,57,70";
 }
+
+// Custom functions for individual machines go here
