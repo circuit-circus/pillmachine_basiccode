@@ -24,6 +24,8 @@ moja & circuitcircus
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Ethernet.h>
+// Define machine individual includes here
+
 
 #define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
