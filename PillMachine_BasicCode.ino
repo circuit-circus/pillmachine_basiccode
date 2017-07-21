@@ -24,9 +24,8 @@ moja & circuitcircus
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Ethernet.h>
+
 // Define machine individual includes here
-
-
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
   #include <avr/power.h>
