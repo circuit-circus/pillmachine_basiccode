@@ -4,6 +4,7 @@ moja & circuitcircus
 15.05: Ethernet pastet ind (men ikke tilrettet)
 16.05: Ethernet virker (men submitter blot en dummy til debug)
 10.07: Tilrettelse af formatering og forberedelse på Github
+01.08: Userval="" case skipper submit via ethernet (f.eks. hvis brugeren ikke har sat et stik i Hvor På Kroppen)
 */
 
 /* CONNECTIONS: 522 RFID --------
@@ -24,6 +25,8 @@ moja & circuitcircus
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Ethernet.h>
+// Define machine individual includes here
+
 
 #define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
@@ -136,22 +139,24 @@ void getID() {
 
 void submitData(String val) {
 
-  aktivateEthernetSPI(true);
+  if(val != "") {
+    aktivateEthernetSPI(true);
 
-  //String datastring= "GET /start_notepad_exe.php HTTP/1.0";
-  //String datastring= "GET /arduino.php?val="+String(val)+" HTTP/1.0";
-  String datastring= "GET /DEV/pillmachine/machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
-  Serial.println(datastring);
+    //String datastring= "GET /start_notepad_exe.php HTTP/1.0";
+    //String datastring= "GET /arduino.php?val="+String(val)+" HTTP/1.0";
+    String datastring= "GET /DEV/pillmachine/machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
+    Serial.println(datastring);
 
-  if(client.connect(pc_server,80)) {
-    client.println(datastring);
-    client.println("Connection: close");
-    client.println(); //vigtigt at sende tom linie
-    client.stop();
-    delay(100);
-  } 
+    if(client.connect(pc_server,80)) {
+      client.println(datastring);
+      client.println("Connection: close");
+      client.println(); //vigtigt at sende tom linie
+      client.stop();
+      delay(100);
+    } 
 
-  aktivateEthernetSPI(false);
+    aktivateEthernetSPI(false);
+  }
 
 }
 
@@ -189,6 +194,8 @@ void UI() {
   delay(500);
 
   userval="28,96,57,70";
+
+  // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
 
 // Custom functions for individual machines go here
