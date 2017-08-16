@@ -51,6 +51,11 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 EthernetClient client;
 
 // Define machine individual variables here
+int yesLed = 3;
+int noLed = 4;
+int yesButton = 5;
+int noButton = 6;
+int activeLed = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -62,6 +67,10 @@ void setup() {
   aktivateEthernetSPI(false);
 
   // Machine individual setups go here
+  pinMode(yesLed, OUTPUT);
+  pinMode(noLed, OUTPUT);
+  pinMode(yesButton, INPUT_PULLUP);
+  pinMode(noButton, INPUT_PULLUP);
 }
 
 void loop() {
@@ -163,8 +172,20 @@ void UI() {
   * pwm output = D3, D5, D5
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
+  if(digitalRead(yesButton)) {
+    digitalWrite(noLed, LOW);
+    activeLed = yesLed;
+    userval="1";
+  }
+  else if(digitalRead(noButton)) {
+    digitalWrite(yesLed, LOW);
+    activeLed = noLed;
+    userval="0";
+  }
 
-  userval="28,96,57,70";
+  if(activeLed != 0) {
+    digitalWrite(activeLed, HIGH);
+  }
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
