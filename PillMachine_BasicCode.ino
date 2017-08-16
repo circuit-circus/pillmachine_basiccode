@@ -191,14 +191,11 @@ void UI() {
   switchVar2 = shiftIn(DATA_PIN, CLOCK_PIN);
   switchVar3 = shiftIn(DATA_PIN, CLOCK_PIN);
 
-  Serial.println(switchVar1, BIN);
-  Serial.println(switchVar2, BIN);
-  Serial.println(switchVar3, BIN);
-
-  Serial.println("-------------------");
   delay(500);
 
-  userval="28,96,57,70";
+  if(getActiveBitPosition() != -1) {
+    userval="" + getActiveBitPosition();
+  }
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
@@ -230,4 +227,32 @@ byte shiftIn(int myDataPin, int myClockPin) {
     digitalWrite(myClockPin, 1);
   }
   return myDataIn;
+}
+
+// Returns a number between 0 and 23 indicating the active bit in the shift registers
+// Returns -1 if no bit is active
+int getActiveBitPosition() {
+  int activeBit = -1;
+  int bitOffset = 0;
+  byte thisByte = 0;
+  if(switchVar1 > 0) {
+    thisByte = switchVar1;
+  }
+  else if(switchVar2 > 0) {
+    thisByte = switchVar2;
+    bitOffset = 8;
+  }
+  else if(switchVar3 > 0) {
+    thisByte = switchVar3;
+    bitOffset = 16;
+  }
+
+  for(int i = 0; i < 7; i++) {
+    int thisBit = bitRead(thisByte, i);
+    if(thisBit == 1) {
+      activeBit = i + bitOffset;
+    }
+  }
+
+  return activeBit;
 }
