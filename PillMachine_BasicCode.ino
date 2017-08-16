@@ -157,7 +157,7 @@ void submitData(String val) {
 
     aktivateEthernetSPI(false);
   }
-
+  resetData();
 }
 
 void aktivateEthernetSPI(boolean x) {
@@ -167,6 +167,11 @@ void aktivateEthernetSPI(boolean x) {
 
   digitalWrite(SS_PIN,x);
   digitalWrite(10,!x);
+}
+
+void resetData() {
+  userval="";
+  // Reset your variables here
 }
 
 // this is where the user interface is responsive
