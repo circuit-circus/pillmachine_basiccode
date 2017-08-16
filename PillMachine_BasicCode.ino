@@ -169,6 +169,7 @@ void aktivateEthernetSPI(boolean x) {
 void resetData() {
   userval="";
   // Reset your variables here
+  activeLed = 0;
 }
 
 // this is where the user interface is responsive
