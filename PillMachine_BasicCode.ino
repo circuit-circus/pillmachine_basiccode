@@ -26,7 +26,7 @@ moja & circuitcircus
 #include <MFRC522.h>
 #include <Ethernet.h>
 // Define machine individual includes here
-
+#include <Servo.h>
 
 #define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
@@ -51,6 +51,10 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 EthernetClient client;
 
 // Define machine individual variables here
+Servo myservo;
+int potVal;
+int potPin = 0;
+int servoPin = 4;
 
 void setup() {
   Serial.begin(9600);
@@ -62,6 +66,7 @@ void setup() {
   aktivateEthernetSPI(false);
 
   // Machine individual setups go here
+  myservo.attach(servoPin);
 }
 
 void loop() {
@@ -168,8 +173,10 @@ void UI() {
   * pwm output = D3, D5, D5
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
-
-  userval="28,96,57,70";
+  potVal = analogRead(potPin);
+  userval = "" + map(potVal, 0, 1023, 0, 255);
+  potVal = map(potVal, 0, 1023, 0, 180);
+  myservo.write(potVal);
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
