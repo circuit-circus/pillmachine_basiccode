@@ -175,7 +175,7 @@ void UI() {
   */
   potVal = analogRead(potPin);
   userval = "" + map(potVal, 0, 1023, 0, 255);
-  potVal = map(potVal, 0, 1023, 0, 180);
+  potVal = map(potVal, 0, 1023, 56, 98);
   myservo.write(potVal);
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
