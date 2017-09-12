@@ -56,7 +56,7 @@ EthernetClient client;
 
 // Define machine individual variables here
 #define PIN 6
-#define NUMPIXELS 8
+#define NUMPIXELS 10
 
 int huePotPin = 2; // analog
 int satPotPin = 3; // analog
