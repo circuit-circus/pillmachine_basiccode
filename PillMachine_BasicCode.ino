@@ -193,8 +193,9 @@ void UI() {
 
   delay(500);
 
-  if(getActiveBitPosition() != -1) {
-    userval="" + getActiveBitPosition();
+  int activeBit = getActiveBitPosition();
+  if(activeBit != -1) {
+    userval="" + activeBit;
   }
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
