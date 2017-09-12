@@ -56,6 +56,7 @@ void setup() {
   Serial.begin(9600);
   SPI.begin();
   mfrc522.PCD_Init();
+  mfrc522.PCD_SetRegisterBitMask(mfrc522.RFCfgReg, (0x07<<4)); // Enhance the MFRC522 Receiver Gain to maximum value of some 48 dB
   pinMode(RFIDLED, OUTPUT);
   Ethernet.begin(mac, myip);
   delay(5000); // wait for ethernetcard
