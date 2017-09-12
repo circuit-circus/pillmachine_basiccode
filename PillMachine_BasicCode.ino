@@ -16,9 +16,9 @@ moja & circuitcircus
 *  RFID GND  -> gnd
 *  RFID RST  -> 9
 *  RFID 3.3V -> 3.3V
-*  
+*
 *  Hvid LED  -> 2
-*  
+*
 *  -----------------------------
 */
 
@@ -31,7 +31,7 @@ moja & circuitcircus
 #define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
 #define SS_PIN 8 // SDA for RFID
-#define RST_PIN 9 // RST 
+#define RST_PIN 9 // RST
 #define pausetid 10
 #define RFIDLED 2 // LEDLIGHT BEHIND RFID TAG ---- brug pin 0 eller 1 i endelig version
 
@@ -65,6 +65,7 @@ void setup() {
   Serial.begin(9600);
   SPI.begin();
   mfrc522.PCD_Init();
+  mfrc522.PCD_SetRegisterBitMask(mfrc522.RFCfgReg, (0x07<<4)); // Enhance the MFRC522 Receiver Gain to maximum value of some 48 dB
   pinMode(RFIDLED, OUTPUT);
   Ethernet.begin(mac, myip);
   delay(5000); // wait for ethernetcard
@@ -144,7 +145,12 @@ void submitData(String val) {
 
     //String datastring= "GET /start_notepad_exe.php HTTP/1.0";
     //String datastring= "GET /arduino.php?val="+String(val)+" HTTP/1.0";
-    String datastring= "GET /DEV/pillmachine/machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
+
+    // IF DEV:
+    String datastring="GET /DEV/pillmachine/machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
+    // IF PRODUCTION:
+    // String datastring="GET /machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
+
     Serial.println(datastring);
 
     if(client.connect(pc_server,80)) {
@@ -153,7 +159,7 @@ void submitData(String val) {
       client.println(); //vigtigt at sende tom linie
       client.stop();
       delay(100);
-    } 
+    }
 
     aktivateEthernetSPI(false);
   }
