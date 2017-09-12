@@ -4,6 +4,7 @@ moja & circuitcircus
 15.05: Ethernet pastet ind (men ikke tilrettet)
 16.05: Ethernet virker (men submitter blot en dummy til debug)
 10.07: Tilrettelse af formatering og forberedelse på Github
+01.08: Userval="" case skipper submit via ethernet (f.eks. hvis brugeren ikke har sat et stik i Hvor På Kroppen)
 */
 
 /* CONNECTIONS: 522 RFID --------
@@ -15,9 +16,9 @@ moja & circuitcircus
 *  RFID GND  -> gnd
 *  RFID RST  -> 9
 *  RFID 3.3V -> 3.3V
-*  
+*
 *  Hvid LED  -> 2
-*  
+*
 *  -----------------------------
 */
 
@@ -34,7 +35,7 @@ moja & circuitcircus
 #define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
 #define SS_PIN 8 // SDA for RFID
-#define RST_PIN 9 // RST 
+#define RST_PIN 9 // RST
 #define pausetid 10
 #define RFIDLED 2 // LEDLIGHT BEHIND RFID TAG ---- brug pin 0 eller 1 i endelig version
 
@@ -116,6 +117,7 @@ void setup() {
   Serial.begin(9600);
   SPI.begin();
   mfrc522.PCD_Init();
+  mfrc522.PCD_SetRegisterBitMask(mfrc522.RFCfgReg, (0x07<<4)); // Enhance the MFRC522 Receiver Gain to maximum value of some 48 dB
   pinMode(RFIDLED, OUTPUT);
   Ethernet.begin(mac, myip);
   delay(5000); // wait for ethernetcard
@@ -188,23 +190,30 @@ void getID() {
 
 void submitData(String val) {
 
-  aktivateEthernetSPI(true);
+  if(val != "") {
+    aktivateEthernetSPI(true);
 
-  //String datastring= "GET /start_notepad_exe.php HTTP/1.0";
-  //String datastring= "GET /arduino.php?val="+String(val)+" HTTP/1.0";
-  String datastring= "GET /DEV/pillmachine/machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
-  Serial.println(datastring);
+    //String datastring= "GET /start_notepad_exe.php HTTP/1.0";
+    //String datastring= "GET /arduino.php?val="+String(val)+" HTTP/1.0";
 
-  if(client.connect(pc_server,80)) {
-    client.println(datastring);
-    client.println("Connection: close");
-    client.println(); //vigtigt at sende tom linie
-    client.stop();
-    delay(100);
-  } 
+    // IF DEV:
+    String datastring="GET /DEV/pillmachine/machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
+    // IF PRODUCTION:
+    // String datastring="GET /machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
 
-  aktivateEthernetSPI(false);
+    Serial.println(datastring);
 
+    if(client.connect(pc_server,80)) {
+      client.println(datastring);
+      client.println("Connection: close");
+      client.println(); //vigtigt at sende tom linie
+      client.stop();
+      delay(100);
+    }
+
+    aktivateEthernetSPI(false);
+  }
+  resetData();
 }
 
 void aktivateEthernetSPI(boolean x) {
@@ -214,6 +223,11 @@ void aktivateEthernetSPI(boolean x) {
 
   digitalWrite(SS_PIN,x);
   digitalWrite(10,!x);
+}
+
+void resetData() {
+  userval="";
+  // Reset your variables here
 }
 
 // this is where the user interface is responsive
@@ -242,6 +256,8 @@ void UI() {
   }
 
   userval="28,96,57,70";
+
+  // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
 
 // Custom functions for individual machines go here
