@@ -66,53 +66,6 @@ int satPotVal = 0;
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 uint32_t stripColor = strip.Color(255, 255, 255);
 
-/* HSB TO RGB CONVERTER
- * Adapted from https://blog.adafruit.com/2012/03/14/constant-brightness-hsb-to-rgb-algorithm/
- *  
- */
-void hsb2rgb(uint16_t hue, uint8_t sat, uint8_t bright) {
-  uint16_t r_temp, g_temp, b_temp;
-  uint8_t index_mod;
-  uint8_t inverse_sat = (sat ^ 255);
-
-  hue = hue % 768;
-  index_mod = hue % 256;
-
-  if (hue < 256) {
-    r_temp = index_mod ^ 255;
-    g_temp = index_mod;
-    b_temp = 0;
-  }
-
-  else if (hue < 512) {
-    r_temp = 0;
-    g_temp = index_mod ^ 255;
-    b_temp = index_mod;
-  }
-
-  else if ( hue < 768) {
-    r_temp = index_mod;
-    g_temp = 0;
-    b_temp = index_mod ^ 255;
-  }
-
-  else {
-    r_temp = 0;
-    g_temp = 0;
-    b_temp = 0;
-  }
-
-  r_temp = ((r_temp * sat) / 255) + inverse_sat;
-  g_temp = ((g_temp * sat) / 255) + inverse_sat;
-  b_temp = ((b_temp * sat) / 255) + inverse_sat;
-
-  r_temp = (r_temp * bright) / 255;
-  g_temp = (g_temp * bright) / 255;
-  b_temp = (b_temp * bright) / 255;
-
-  stripColor = strip.Color((uint8_t)r_temp, (uint8_t)g_temp, (uint8_t)b_temp);
-}
-
 void setup() {
   Serial.begin(9600);
   SPI.begin();
@@ -243,7 +196,7 @@ void UI() {
 
   // Map hue from 0 to 767 (what the hsb2rgb takes as max)
   int hue = map(huePotVal, 0, 1024, 0, 767);
-  
+
   // Map saturation from 150 to 254 - doing 0 to 254 makes it white for a large part of the potentiometer "rotation", we don't want that
   int saturation = map(satPotVal, 0, 1024, 150, 254);
 
@@ -261,3 +214,50 @@ void UI() {
 }
 
 // Custom functions for individual machines go here
+
+/* HSB TO RGB CONVERTER
+ * Adapted from https://blog.adafruit.com/2012/03/14/constant-brightness-hsb-to-rgb-algorithm/
+ *
+ */
+void hsb2rgb(uint16_t hue, uint8_t sat, uint8_t bright) {
+  uint16_t r_temp, g_temp, b_temp;
+  uint8_t index_mod;
+  uint8_t inverse_sat = (sat ^ 255);
+
+  hue = hue % 768;
+  index_mod = hue % 256;
+
+  if (hue < 256) {
+    r_temp = index_mod ^ 255;
+    g_temp = index_mod;
+    b_temp = 0;
+  }
+
+  else if (hue < 512) {
+    r_temp = 0;
+    g_temp = index_mod ^ 255;
+    b_temp = index_mod;
+  }
+
+  else if ( hue < 768) {
+    r_temp = index_mod;
+    g_temp = 0;
+    b_temp = index_mod ^ 255;
+  }
+
+  else {
+    r_temp = 0;
+    g_temp = 0;
+    b_temp = 0;
+  }
+
+  r_temp = ((r_temp * sat) / 255) + inverse_sat;
+  g_temp = ((g_temp * sat) / 255) + inverse_sat;
+  b_temp = ((b_temp * sat) / 255) + inverse_sat;
+
+  r_temp = (r_temp * bright) / 255;
+  g_temp = (g_temp * bright) / 255;
+  b_temp = (b_temp * bright) / 255;
+
+  stripColor = strip.Color((uint8_t)r_temp, (uint8_t)g_temp, (uint8_t)b_temp);
+}
