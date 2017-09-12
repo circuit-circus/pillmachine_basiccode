@@ -208,9 +208,7 @@ void UI() {
     delay(10);
   }
 
-  userval="28,96,57,70";
-
-  // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
+  userval = String(hue, DEC) + "," + String(saturation, DEC);
 }
 
 // Custom functions for individual machines go here
