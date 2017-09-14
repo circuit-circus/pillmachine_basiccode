@@ -27,6 +27,7 @@ moja & circuitcircus
 #include <Ethernet.h>
 // Define machine individual includes here
 #include <Servo.h>
+#include <FastLED.h>
 
 #define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
@@ -54,7 +55,10 @@ EthernetClient client;
 Servo myservo;
 int potVal;
 int potPin = 0;
-int servoPin = 4;
+int servoPin = A1;
+#define LEDPIN 5
+#define NUM_LEDS 1
+CRGB leds[NUM_LEDS];
 
 void setup() {
   Serial.begin(9600);
@@ -68,6 +72,8 @@ void setup() {
 
   // Machine individual setups go here
   myservo.attach(servoPin);
+  FastLED.addLeds<NEOPIXEL, LEDPIN>(leds, NUM_LEDS);
+  FastLED.clear();
 }
 
 void loop() {
@@ -171,6 +177,8 @@ void aktivateEthernetSPI(boolean x) {
 void resetData() {
   userval="";
   // Reset your variables here
+  leds[0] = CRGB::Black;
+  FastLED.show();
 }
 
 // this is where the user interface is responsive
@@ -179,10 +187,13 @@ void UI() {
   * pwm output = D3, D5, D5
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
+  leds[0] = CRGB::White;
+  FastLED.show();
+
   potVal = analogRead(potPin);
   userval = "" + map(potVal, 0, 1023, 0, 255);
-  potVal = map(potVal, 0, 1023, 56, 98);
-  myservo.write(potVal);
+  potVal = map(potVal, 0, 1024, 1211, 1644);
+  myservo.writeMicroseconds(potVal);
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
