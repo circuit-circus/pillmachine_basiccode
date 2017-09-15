@@ -63,7 +63,7 @@ int satPotPin = 3; // analog
 int huePotVal = 0;
 int satPotVal = 0;
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_RGB + NEO_KHZ800);
 uint32_t stripColor = strip.Color(255, 255, 255);
 
 void setup() {
@@ -200,7 +200,7 @@ void UI() {
   // Map saturation from 150 to 254 - doing 0 to 254 makes it white for a large part of the potentiometer "rotation", we don't want that
   int saturation = map(satPotVal, 0, 1024, 150, 254);
 
-  hsb2rgb(hue, saturation, 255); // Updates the stripColor value to match
+  hsb2rgb(hue, saturation, 150); // Updates the stripColor value to match
 
   for(int i = 0; i < NUMPIXELS; i++) {
     strip.setPixelColor(i, stripColor);
@@ -256,6 +256,14 @@ void hsb2rgb(uint16_t hue, uint8_t sat, uint8_t bright) {
   r_temp = (r_temp * bright) / 255;
   g_temp = (g_temp * bright) / 255;
   b_temp = (b_temp * bright) / 255;
+  
+  /*
+  Serial.print((uint8_t)r_temp);
+  Serial.print("  ");
+  Serial.print((uint8_t)g_temp);
+  Serial.print("  ");
+  Serial.println((uint8_t)b_temp);
+  */
 
   stripColor = strip.Color((uint8_t)r_temp, (uint8_t)g_temp, (uint8_t)b_temp);
 }
