@@ -43,8 +43,8 @@ static uint8_t mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF };
 static uint8_t myip[] = {  10, 0, 0, 100 };
 IPAddress pc_server(10,0,0,31);  // serverens adress
 
-boolean cardPresent = false; // DEBUG: Set this and isDebugging to true to test UI
-boolean isDebugging = false; // DEBUG: Set this and cardPresent to true to test UI
+boolean cardPresent = true; // DEBUG: Set this and isDebugging to true to test UI
+boolean isDebugging = true; // DEBUG: Set this and cardPresent to true to test UI
 boolean cardPresent_old = false;
 String cardID = ""; // NB skal muligvis laves til char-array for at spare memory
 String cardID_old = "";
@@ -62,6 +62,13 @@ int huePotPin = 2; // analog
 int satPotPin = 3; // analog
 int huePotVal = 0;
 int satPotVal = 0;
+
+int brightness = 220;
+int brightnessModifier = -1;
+
+int red = 255;
+int green = 255;
+int blue = 255;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_RGB + NEO_KHZ800);
 uint32_t stripColor = strip.Color(255, 255, 255);
@@ -200,9 +207,23 @@ void UI() {
   // Map saturation from 150 to 254 - doing 0 to 254 makes it white for a large part of the potentiometer "rotation", we don't want that
   int saturation = map(satPotVal, 0, 1024, 150, 254);
 
-  hsb2rgb(hue, saturation, 150); // Updates the stripColor value to match
+
+  if(brightness <= 150 || brightness >= 240) {
+    brightnessModifier *= -1;
+  }
+
+  brightness += brightnessModifier;
+
+  hsb2rgb(hue, 255, 150); // Updates the stripColor value to match
 
   for(int i = 0; i < NUMPIXELS; i++) {
+
+    red = i < 5 ? red - i*2 : red + i*2;
+    green = i < 5 ? green - i*2 : green + i*2;
+    blue = i < 5 ? blue - i*2 : blue + i*2;
+
+    stripColor = strip.Color(red, green, blue);
+    
     strip.setPixelColor(i, stripColor);
     strip.show();
     delay(10);
@@ -256,6 +277,10 @@ void hsb2rgb(uint16_t hue, uint8_t sat, uint8_t bright) {
   r_temp = (r_temp * bright) / 255;
   g_temp = (g_temp * bright) / 255;
   b_temp = (b_temp * bright) / 255;
+
+  red = (uint8_t)r_temp;
+  green = (uint8_t)g_temp;
+  blue = (uint8_t)b_temp;
   
   /*
   Serial.print((uint8_t)r_temp);
@@ -265,5 +290,5 @@ void hsb2rgb(uint16_t hue, uint8_t sat, uint8_t bright) {
   Serial.println((uint8_t)b_temp);
   */
 
-  stripColor = strip.Color((uint8_t)r_temp, (uint8_t)g_temp, (uint8_t)b_temp);
+  //stripColor = strip.Color((uint8_t)r_temp, (uint8_t)g_temp, (uint8_t)b_temp);
 }
