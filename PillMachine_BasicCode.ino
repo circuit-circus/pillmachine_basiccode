@@ -240,8 +240,8 @@ void UI() {
 
   }
 
-
-  userval = "28,96,57,70";
+  userval = String(ledStates[0], DEC) + "," + String(ledStates[1], DEC) + "," + String(ledStates[2], DEC) + "," + String(ledStates[3], DEC) + "," + String(ledStates[4], DEC) + "," + String(ledStates[5], DEC);
+  
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
