@@ -201,6 +201,8 @@ void UI() {
   huePotVal = analogRead(huePotPin);
   satPotVal = analogRead(satPotPin);
 
+  huePotVal = 10;
+
   // Map hue from 0 to 767 (what the hsb2rgb takes as max)
   int hue = map(huePotVal, 0, 1024, 0, 767);
 
@@ -214,20 +216,10 @@ void UI() {
 
   brightness += brightnessModifier;
 
-  hsb2rgb(hue, 255, 150); // Updates the stripColor value to match
+  hsb2rgb(hue, 255, 100); // Updates the stripColor value to match
 
-  for(int i = 0; i < NUMPIXELS; i++) {
-
-    red = i < 5 ? red - i*2 : red + i*2;
-    green = i < 5 ? green - i*2 : green + i*2;
-    blue = i < 5 ? blue - i*2 : blue + i*2;
-
-    stripColor = strip.Color(red, green, blue);
-    
-    strip.setPixelColor(i, stripColor);
-    strip.show();
-    delay(10);
-  }
+  gradient(strip.Color(red, green, blue), strip.Color(red + 50, green + 50, blue + 50));
+  
 
   userval = String(hue, DEC) + "," + String(saturation, DEC);
 }
@@ -291,4 +283,32 @@ void hsb2rgb(uint16_t hue, uint8_t sat, uint8_t bright) {
   */
 
   //stripColor = strip.Color((uint8_t)r_temp, (uint8_t)g_temp, (uint8_t)b_temp);
+}
+
+
+void gradient(uint32_t Color1, uint32_t Color2) {
+  int totalSteps = strip.numPixels();
+  for (int i = 0; i < totalSteps; i++) {
+    red = ((Red(Color1) * (totalSteps - i)) + (Red(Color2) * i)) / totalSteps;
+    green = ((Green(Color1) * (totalSteps - i)) + (Green(Color2) * i)) / totalSteps;
+    blue = ((Blue(Color1) * (totalSteps - i)) + (Blue(Color2) * i)) / totalSteps;
+    
+    strip.setPixelColor(i, strip.Color(red, green, blue));
+  }
+  strip.show();
+}
+
+// Returns the Red component of a 32-bit color
+uint8_t Red(uint32_t color) {
+    return (color >> 16) & 0xFF;
+}
+
+// Returns the Green component of a 32-bit color
+uint8_t Green(uint32_t color) {
+    return (color >> 8) & 0xFF;
+}
+
+// Returns the Blue component of a 32-bit color
+uint8_t Blue(uint32_t color) {
+    return color & 0xFF;
 }
