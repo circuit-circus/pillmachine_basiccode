@@ -70,6 +70,17 @@ int red = 255;
 int green = 255;
 int blue = 255;
 
+
+int groups[3][5] = {
+  {2, 6, 7},
+  {1, 3, 5, 8, 9},
+  {0, 4}
+};
+
+int groupA[] = {2, 6, 7};
+int groupB[] = {1, 3, 5, 8, 9};
+int groupC[] = {0, 4};
+
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_RGB + NEO_KHZ800);
 uint32_t stripColor = strip.Color(255, 255, 255);
 
@@ -218,7 +229,7 @@ void UI() {
 
   hsb2rgb(hue, 255, 100); // Updates the stripColor value to match
 
-  gradient(strip.Color(red, green, blue), strip.Color(red + 50, green + 50, blue + 50));
+  gradientCentered(strip.Color(red, green, blue), strip.Color(red + 50, green + 50, blue + 50));
   
 
   userval = String(hue, DEC) + "," + String(saturation, DEC);
@@ -297,6 +308,27 @@ void gradient(uint32_t Color1, uint32_t Color2) {
   }
   strip.show();
 }
+
+
+
+void gradientCentered(uint32_t Color1, uint32_t Color2) {
+
+
+  int totalSteps = 3;
+  for (int i = 0; i < totalSteps; i++) {
+    red = ((Red(Color1) * (totalSteps - i)) + (Red(Color2) * i)) / totalSteps;
+    green = ((Green(Color1) * (totalSteps - i)) + (Green(Color2) * i)) / totalSteps;
+    blue = ((Blue(Color1) * (totalSteps - i)) + (Blue(Color2) * i)) / totalSteps;
+
+    for (int j = 0; j < 5; j++) {
+      strip.setPixelColor(groups[i][j], strip.Color(red, green, blue));
+    }
+  }
+
+  strip.show();
+
+}
+
 
 // Returns the Red component of a 32-bit color
 uint8_t Red(uint32_t color) {
