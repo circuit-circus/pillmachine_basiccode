@@ -254,7 +254,7 @@ int getActiveBitPosition() {
     bitOffset = 16;
   }
 
-  for(int i = 0; i < 7; i++) {
+  for(int i = 0; i <= 7; i++) {
     int thisBit = bitRead(thisByte, i);
     if(thisBit == 1) {
       activeBit = i + bitOffset;
