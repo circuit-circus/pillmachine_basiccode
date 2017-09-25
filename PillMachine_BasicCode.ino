@@ -43,8 +43,8 @@ static uint8_t mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF };
 static uint8_t myip[] = {  10, 0, 0, 100 };
 IPAddress pc_server(10,0,0,31);  // serverens adress
 
-boolean cardPresent = true; // DEBUG: Set this and isDebugging to true to test UI
-boolean isDebugging = true; // DEBUG: Set this and cardPresent to true to test UI
+boolean cardPresent = false; // DEBUG: Set this and isDebugging to true to test UI
+boolean isDebugging = false; // DEBUG: Set this and cardPresent to true to test UI
 boolean cardPresent_old = false;
 String cardID = ""; // NB skal muligvis laves til char-array for at spare memory
 String cardID_old = "";
@@ -211,8 +211,7 @@ void UI() {
   // Machine specific
   huePotVal = analogRead(huePotPin);
   satPotVal = analogRead(satPotPin);
-
-  huePotVal = 10;
+ 
 
   // Map hue from 0 to 767 (what the hsb2rgb takes as max)
   int hue = map(huePotVal, 0, 1024, 0, 767);
@@ -220,6 +219,20 @@ void UI() {
   // Map saturation from 150 to 254 - doing 0 to 254 makes it white for a large part of the potentiometer "rotation", we don't want that
   int saturation = map(satPotVal, 0, 1024, 150, 254);
 
+  if(isDebugging) {
+    Serial.print("HUE POT : ");
+    Serial.println(huePotVal);
+    Serial.print("SAT POT : ");
+    Serial.println(satPotVal);
+
+    Serial.print("HUE : ");
+    Serial.println(hue);
+    Serial.print("SAT : ");
+    Serial.println(saturation);
+  
+    Serial.println("------------");
+
+  }
 
   if(brightness <= 150 || brightness >= 240) {
     brightnessModifier *= -1;
@@ -227,10 +240,9 @@ void UI() {
 
   brightness += brightnessModifier;
 
-  hsb2rgb(hue, 255, 100); // Updates the stripColor value to match
+  hsb2rgb(hue, saturation, 100); // Updates the stripColor value to match
 
   gradientCentered(strip.Color(red, green, blue), strip.Color(red + 50, green + 50, blue + 50));
-  
 
   userval = String(hue, DEC) + "," + String(saturation, DEC);
 }
@@ -284,16 +296,6 @@ void hsb2rgb(uint16_t hue, uint8_t sat, uint8_t bright) {
   red = (uint8_t)r_temp;
   green = (uint8_t)g_temp;
   blue = (uint8_t)b_temp;
-  
-  /*
-  Serial.print((uint8_t)r_temp);
-  Serial.print("  ");
-  Serial.print((uint8_t)g_temp);
-  Serial.print("  ");
-  Serial.println((uint8_t)b_temp);
-  */
-
-  //stripColor = strip.Color((uint8_t)r_temp, (uint8_t)g_temp, (uint8_t)b_temp);
 }
 
 
