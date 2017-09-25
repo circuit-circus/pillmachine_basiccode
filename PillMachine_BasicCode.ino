@@ -26,7 +26,10 @@ moja & circuitcircus
 #include <MFRC522.h>
 #include <Ethernet.h>
 // Define machine individual includes here
-
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+  #include <avr/power.h>
+#endif
 
 #define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
@@ -51,6 +54,52 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 EthernetClient client;
 
 // Define machine individual variables here
+// Which pin on the Arduino is connected to the two NeoPixel strands?
+#define FREQ_PIN 6
+#define ACTIVITY_PIN 5
+
+// How many NeoPixels are attached to the Arduino?
+#define FREQ_NUMPIXELS 40
+#define ACTIVITY_NUMPIXELS 8
+
+Adafruit_NeoPixel freq_pixels = Adafruit_NeoPixel(FREQ_NUMPIXELS, FREQ_PIN, NEO_GRB + NEO_KHZ400);
+Adafruit_NeoPixel activity_pixels = Adafruit_NeoPixel(ACTIVITY_NUMPIXELS, ACTIVITY_PIN, NEO_GRB + NEO_KHZ400);
+
+int NO_OF_ROWS = 8;
+int NO_OF_COLUMNS = 5;
+
+int sliderPin = A0;
+int sliderVal;
+// Divide by this to reduce "udslag" in AnalogRead
+int sliderCorrector = 8;
+
+int activeRow;
+int lastActiveRow;
+
+int encoderPin1 = 2;
+int encoderPin2 = 3;
+
+volatile int lastEncoded = 0;
+volatile long encoderValue = 0;
+
+int mapSensitivity = 40;
+int blinky = 50;
+
+int activeColumn = 0;
+
+int pixelMatrix[8][5] = {
+  {0, 1, 2, 3, 4},
+  {5, 6, 7, 8, 9},
+  {10, 11, 12, 13, 14},
+  {15, 16, 17, 18, 19},
+  {20, 21, 22, 23, 24},
+  {25, 26, 27, 28, 29},
+  {30, 31, 32, 33, 34},
+  {35, 36, 37, 38, 39}
+};
+
+int savedVals[8] = {"", "", "", "", "", "", "", ""};
+int savedEncoderVals[8] = {"", "", "", "", "", "", "", ""};
 
 void setup() {
   Serial.begin(9600);
@@ -63,6 +112,20 @@ void setup() {
   aktivateEthernetSPI(false);
 
   // Machine individual setups go here
+  freq_pixels.begin(); // This initializes the NeoPixel library.
+  activity_pixels.begin(); // This initializes the NeoPixel library.
+
+  freq_pixels.clear();
+  activity_pixels.clear();
+
+  pinMode(encoderPin1, INPUT);
+  pinMode(encoderPin2, INPUT);
+
+  digitalWrite(encoderPin1, HIGH); //turn pullup resistor on
+  digitalWrite(encoderPin2, HIGH); //turn pullup resistor on
+
+  attachInterrupt(0, updateEncoder, CHANGE);
+  attachInterrupt(1, updateEncoder, CHANGE);
 }
 
 void loop() {
@@ -166,6 +229,8 @@ void aktivateEthernetSPI(boolean x) {
 void resetData() {
   userval="";
   // Reset your variables here
+  freq_pixels.clear();
+  activity_pixels.clear();
 }
 
 // this is where the user interface is responsive
@@ -175,9 +240,80 @@ void UI() {
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
 
-  userval="28,96,57,70";
+  freq_pixels.clear();
+  activity_pixels.clear();
+
+  sliderVal = analogRead(sliderPin);
+  Serial.print("Sliderval: ");
+  Serial.println(sliderVal);
+  // Reduce size to reduce 
+  sliderVal = sliderVal / sliderCorrector;
+  Serial.print("Corrected sliderval: ");
+  Serial.println(sliderVal);
+  // Slider is wired in reverse, so we must subtract from NO_OF_ROWS
+  activeRow = NO_OF_ROWS - map(sliderVal, 0, 1024 / sliderCorrector, 0, NO_OF_ROWS) - 1;
+
+  if(activeRow != lastActiveRow) { // If we have changed rows
+    // Saving the values for later
+    savedVals[lastActiveRow] = pixelMatrix[lastActiveRow][activeColumn];
+    savedEncoderVals[lastActiveRow] = encoderValue;
+
+    // If we already have a saved value, jump to that
+    if(savedVals[activeRow] != "") {
+      activeColumn = savedVals[activeRow];
+      encoderValue = savedEncoderVals[activeRow];
+    }
+    // Else, we're on zero
+    else {
+      encoderValue = 0;
+      activeColumn = 0;
+    }
+  }
+  else {
+    activeColumn = map(encoderValue, 0, mapSensitivity + 1, 0, NO_OF_COLUMNS);
+  }
+
+  lastActiveRow = activeRow;
+
+  freq_pixels.setPixelColor(pixelMatrix[activeRow][activeColumn], freq_pixels.Color(50, 50, 50));
+  activity_pixels.setPixelColor(activeRow, activity_pixels.Color(blinky, blinky, blinky)); 
+
+  // Set the color of the non-active rows
+  for(int i = 0; i < NO_OF_ROWS; i++) {
+    if(i != activeRow) {
+      freq_pixels.setPixelColor(savedVals[i], freq_pixels.Color(0, 0, 50));
+    }
+    delay(10);
+  }
+  
+  freq_pixels.show();
+  activity_pixels.show();
+
+  userval = "";
+  for(int j = 0; j < NO_OF_ROWS; j++) {
+    // Make sure number is between 0 and 4
+    userval += (savedVals[j] % 5);
+    // Add a comma for all except the final row
+    if(j != NO_OF_ROWS - 1) {
+      userval += ",";
+    }
+  }
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
 
 // Custom functions for individual machines go here
+void updateEncoder() {
+  int MSB = digitalRead(encoderPin1); //MSB = most significant bit
+  int LSB = digitalRead(encoderPin2); //LSB = least significant bit
+
+  int encoded = (MSB << 1) | LSB; //converting the 2 pin value to single number
+  int sum  = (lastEncoded << 2) | encoded; //adding it to the previous encoded value
+
+  if (sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValue ++;
+  if (sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValue --;
+
+  lastEncoded = encoded; //store this value for next time
+
+  encoderValue = constrain(encoderValue, 0, mapSensitivity);
+}
