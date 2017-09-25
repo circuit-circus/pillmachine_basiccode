@@ -30,6 +30,7 @@ moja & circuitcircus
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
+#include <ResponsiveAnalogRead.h>
 
 #define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
@@ -68,10 +69,9 @@ Adafruit_NeoPixel activity_pixels = Adafruit_NeoPixel(ACTIVITY_NUMPIXELS, ACTIVI
 int NO_OF_ROWS = 8;
 int NO_OF_COLUMNS = 5;
 
-int sliderPin = A0;
+const int sliderPin = A0;
 int sliderVal;
-// Divide by this to reduce "udslag" in AnalogRead
-int sliderCorrector = 8;
+ResponsiveAnalogRead analog(sliderPin, false);
 
 int activeRow;
 int lastActiveRow;
@@ -82,6 +82,7 @@ int encoderPin2 = 3;
 volatile int lastEncoded = 0;
 volatile long encoderValue = 0;
 
+// How big steps should the encoder move the LED columns in?
 int mapSensitivity = 40;
 int blinky = 50;
 
@@ -240,18 +241,15 @@ void UI() {
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
 
-  freq_pixels.clear();
-  activity_pixels.clear();
+  if(userval == "") {
+    freq_pixels.clear();
+    activity_pixels.clear();
+  }
 
-  sliderVal = analogRead(sliderPin);
-  Serial.print("Sliderval: ");
-  Serial.println(sliderVal);
-  // Reduce size to reduce 
-  sliderVal = sliderVal / sliderCorrector;
-  Serial.print("Corrected sliderval: ");
-  Serial.println(sliderVal);
+  analog.update();
+  sliderVal = analog.getValue();
   // Slider is wired in reverse, so we must subtract from NO_OF_ROWS
-  activeRow = NO_OF_ROWS - map(sliderVal, 0, 1024 / sliderCorrector, 0, NO_OF_ROWS) - 1;
+  activeRow = NO_OF_ROWS - map(sliderVal, 0, 1024, 0, NO_OF_ROWS) - 1;
 
   if(activeRow != lastActiveRow) { // If we have changed rows
     // Saving the values for later
