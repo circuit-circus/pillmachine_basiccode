@@ -109,7 +109,7 @@ void setup() {
   mfrc522.PCD_SetRegisterBitMask(mfrc522.RFCfgReg, (0x07<<4)); // Enhance the MFRC522 Receiver Gain to maximum value of some 48 dB
   pinMode(RFIDLED, OUTPUT);
   Ethernet.begin(mac, myip);
-  delay(5000); // wait for ethernetcard
+  delay(500); // wait for ethernetcard
   aktivateEthernetSPI(false);
 
   // Machine individual setups go here
@@ -232,6 +232,14 @@ void resetData() {
   // Reset your variables here
   freq_pixels.clear();
   activity_pixels.clear();
+  for(int i = 0; i < NO_OF_ROWS; i++) {
+    savedVals[i] = "";
+    savedEncoderVals[i] = "";
+  }
+  activeRow = 0;
+  lastActiveRow = -1;
+  activeColumn = 0;
+  encoderValue = 0;
 }
 
 // this is where the user interface is responsive
@@ -266,6 +274,28 @@ void UI() {
       encoderValue = 0;
       activeColumn = 0;
     }
+
+    // Turn off all actPixels and then turn on the activeRow
+    for(int a = 0; a < NO_OF_ROWS; a++) {
+      if(a != activeRow) {
+        activity_pixels.setPixelColor(a, activity_pixels.Color(0, 0, 0));
+      }
+      else {
+        activity_pixels.setPixelColor(a, activity_pixels.Color(50, 50, 50));
+      }
+    }
+
+    // Turn off all freqPixels on the row we left but leave the column turned on
+    int newStart = lastActiveRow * NO_OF_COLUMNS;
+    Serial.println(savedVals[lastActiveRow]);
+    for(int b = newStart; b < newStart + NO_OF_COLUMNS; b++) {
+      if(b != savedVals[lastActiveRow]) {
+        freq_pixels.setPixelColor(b, freq_pixels.Color(0, 0, 0));
+      }
+      else {
+        freq_pixels.setPixelColor(b, freq_pixels.Color(0, 0, 50));
+      }
+    }
   }
   else {
     activeColumn = map(encoderValue, 0, mapSensitivity + 1, 0, NO_OF_COLUMNS);
@@ -273,7 +303,17 @@ void UI() {
 
   lastActiveRow = activeRow;
 
-  freq_pixels.setPixelColor(pixelMatrix[activeRow][activeColumn], freq_pixels.Color(50, 50, 50));
+  int newStart = activeRow * NO_OF_COLUMNS;
+  Serial.println(savedVals[lastActiveRow]);
+  for(int c = newStart; c < newStart + NO_OF_COLUMNS; c++) {
+    if(c != newStart + activeColumn) {
+      freq_pixels.setPixelColor(c, freq_pixels.Color(0, 0, 0));
+    }
+    else {
+      freq_pixels.setPixelColor(c, freq_pixels.Color(50, 50, 50));
+    }
+  }
+  /*freq_pixels.setPixelColor(pixelMatrix[activeRow][activeColumn], freq_pixels.Color(50, 50, 50));
   activity_pixels.setPixelColor(activeRow, activity_pixels.Color(blinky, blinky, blinky)); 
 
   // Set the color of the non-active rows
@@ -282,7 +322,7 @@ void UI() {
       freq_pixels.setPixelColor(savedVals[i], freq_pixels.Color(0, 0, 50));
     }
     delay(10);
-  }
+  }*/
   
   freq_pixels.show();
   activity_pixels.show();
