@@ -275,39 +275,39 @@ void UI() {
       activeColumn = 0;
     }
 
-    // Turn off all actPixels except the on on activeRow
-    for(int a = 0; a < NO_OF_ROWS; a++) {
-      if(a != activeRow) {
-        activity_pixels.setPixelColor(a, activity_pixels.Color(0, 0, 0));
-      }
-      else {
-        activity_pixels.setPixelColor(a, activity_pixels.Color(50, 50, 50));
-      }
-    }
-
     // Turn off all freqPixels on the row we left but leave the chosen column turned on
     int lastRowStart = lastActiveRow * NO_OF_COLUMNS;
-    for(int b = lastRowStart; b < lastRowStart + NO_OF_COLUMNS; b++) {
-      if(b != savedVals[lastActiveRow]) {
-        freq_pixels.setPixelColor(b, freq_pixels.Color(0, 0, 0));
+    for(int i = lastRowStart; i < lastRowStart + NO_OF_COLUMNS; b++) {
+      if(i != savedVals[lastActiveRow]) {
+        freq_pixels.setPixelColor(i, freq_pixels.Color(0, 0, 0));
       }
       else {
-        freq_pixels.setPixelColor(b, freq_pixels.Color(0, 0, 50));
+        freq_pixels.setPixelColor(i, freq_pixels.Color(0, 0, 50));
       }
     }
   }
 
   activeColumn = map(encoderValue, 0, mapSensitivity + 1, 0, NO_OF_COLUMNS);
-
   lastActiveRow = activeRow;
 
-  int rowStart = activeRow * NO_OF_COLUMNS;
-  for(int c = rowStart; c < rowStart + NO_OF_COLUMNS; c++) {
-    if(c != rowStart + activeColumn) {
-      freq_pixels.setPixelColor(c, freq_pixels.Color(0, 0, 0));
+  // Turn off all activity_pixels except the one on activeRow
+  for(int j = 0; j < NO_OF_ROWS; j++) {
+    if(j != activeRow) {
+      activity_pixels.setPixelColor(j, activity_pixels.Color(0, 0, 0));
     }
     else {
-      freq_pixels.setPixelColor(c, freq_pixels.Color(50, 50, 50));
+      activity_pixels.setPixelColor(j, activity_pixels.Color(50, 50, 50));
+    }
+  }
+
+  // Turn off all freq_pixels on activeRow except the currently active one
+  int rowStart = activeRow * NO_OF_COLUMNS;
+  for(int k = rowStart; k < rowStart + NO_OF_COLUMNS; k++) {
+    if(k != rowStart + activeColumn) {
+      freq_pixels.setPixelColor(k, freq_pixels.Color(0, 0, 0));
+    }
+    else {
+      freq_pixels.setPixelColor(k, freq_pixels.Color(50, 50, 50));
     }
   }
   
@@ -315,11 +315,11 @@ void UI() {
   activity_pixels.show();
 
   userval = "";
-  for(int j = 0; j < NO_OF_ROWS; j++) {
+  for(int l = 0; l < NO_OF_ROWS; l++) {
     // Make sure number is between 0 and 4
-    userval += (savedVals[j] % 5);
+    userval += (savedVals[l] % 5);
     // Add a comma for all except the final row
-    if(j != NO_OF_ROWS - 1) {
+    if(l != NO_OF_ROWS - 1) {
       userval += ",";
     }
   }
