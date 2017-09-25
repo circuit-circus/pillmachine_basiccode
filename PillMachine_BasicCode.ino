@@ -84,9 +84,11 @@ volatile long encoderValue = 0;
 
 // How big steps should the encoder move the LED columns in?
 int mapSensitivity = 34;
-int blinky = 50;
 
 int activeColumn = 0;
+
+unsigned long previousBlinkMillis = 0;
+int blinkLedState = LOW;
 
 int pixelMatrix[8][5] = {
   {0, 1, 2, 3, 4},
@@ -296,7 +298,21 @@ void UI() {
       activity_pixels.setPixelColor(j, activity_pixels.Color(0, 0, 0));
     }
     else {
-      activity_pixels.setPixelColor(j, activity_pixels.Color(50, 50, 50));
+
+      // Blink LED
+      unsigned long currentMillis = millis();
+
+      if (currentMillis - previousBlinkMillis >= 700) {
+        previousBlinkMillis = currentMillis;
+
+        if(blinkLedState == LOW) {
+          blinkLedState = HIGH;
+          activity_pixels.setPixelColor(j, activity_pixels.Color(50, 50, 50));
+        } else {
+          blinkLedState = LOW;
+          activity_pixels.setPixelColor(j, activity_pixels.Color(0, 0, 0));
+        }
+      }
     }
   }
 
