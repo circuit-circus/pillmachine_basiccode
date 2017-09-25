@@ -83,7 +83,7 @@ volatile int lastEncoded = 0;
 volatile long encoderValue = 0;
 
 // How big steps should the encoder move the LED columns in?
-int mapSensitivity = 40;
+int mapSensitivity = 34;
 int blinky = 50;
 
 int activeColumn = 0;
@@ -109,7 +109,7 @@ void setup() {
   mfrc522.PCD_SetRegisterBitMask(mfrc522.RFCfgReg, (0x07<<4)); // Enhance the MFRC522 Receiver Gain to maximum value of some 48 dB
   pinMode(RFIDLED, OUTPUT);
   Ethernet.begin(mac, myip);
-  delay(500); // wait for ethernetcard
+  delay(5000); // wait for ethernetcard
   aktivateEthernetSPI(false);
 
   // Machine individual setups go here
@@ -277,7 +277,7 @@ void UI() {
 
     // Turn off all freqPixels on the row we left but leave the chosen column turned on
     int lastRowStart = lastActiveRow * NO_OF_COLUMNS;
-    for(int i = lastRowStart; i < lastRowStart + NO_OF_COLUMNS; b++) {
+    for(int i = lastRowStart; i < lastRowStart + NO_OF_COLUMNS; i++) {
       if(i != savedVals[lastActiveRow]) {
         freq_pixels.setPixelColor(i, freq_pixels.Color(0, 0, 0));
       }
