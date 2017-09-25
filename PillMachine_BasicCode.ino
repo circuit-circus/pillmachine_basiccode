@@ -275,7 +275,7 @@ void UI() {
       activeColumn = 0;
     }
 
-    // Turn off all actPixels and then turn on the activeRow
+    // Turn off all actPixels except the on on activeRow
     for(int a = 0; a < NO_OF_ROWS; a++) {
       if(a != activeRow) {
         activity_pixels.setPixelColor(a, activity_pixels.Color(0, 0, 0));
@@ -285,10 +285,9 @@ void UI() {
       }
     }
 
-    // Turn off all freqPixels on the row we left but leave the column turned on
-    int newStart = lastActiveRow * NO_OF_COLUMNS;
-    Serial.println(savedVals[lastActiveRow]);
-    for(int b = newStart; b < newStart + NO_OF_COLUMNS; b++) {
+    // Turn off all freqPixels on the row we left but leave the chosen column turned on
+    int lastRowStart = lastActiveRow * NO_OF_COLUMNS;
+    for(int b = lastRowStart; b < lastRowStart + NO_OF_COLUMNS; b++) {
       if(b != savedVals[lastActiveRow]) {
         freq_pixels.setPixelColor(b, freq_pixels.Color(0, 0, 0));
       }
@@ -297,32 +296,20 @@ void UI() {
       }
     }
   }
-  else {
-    activeColumn = map(encoderValue, 0, mapSensitivity + 1, 0, NO_OF_COLUMNS);
-  }
+
+  activeColumn = map(encoderValue, 0, mapSensitivity + 1, 0, NO_OF_COLUMNS);
 
   lastActiveRow = activeRow;
 
-  int newStart = activeRow * NO_OF_COLUMNS;
-  Serial.println(savedVals[lastActiveRow]);
-  for(int c = newStart; c < newStart + NO_OF_COLUMNS; c++) {
-    if(c != newStart + activeColumn) {
+  int rowStart = activeRow * NO_OF_COLUMNS;
+  for(int c = rowStart; c < rowStart + NO_OF_COLUMNS; c++) {
+    if(c != rowStart + activeColumn) {
       freq_pixels.setPixelColor(c, freq_pixels.Color(0, 0, 0));
     }
     else {
       freq_pixels.setPixelColor(c, freq_pixels.Color(50, 50, 50));
     }
   }
-  /*freq_pixels.setPixelColor(pixelMatrix[activeRow][activeColumn], freq_pixels.Color(50, 50, 50));
-  activity_pixels.setPixelColor(activeRow, activity_pixels.Color(blinky, blinky, blinky)); 
-
-  // Set the color of the non-active rows
-  for(int i = 0; i < NO_OF_ROWS; i++) {
-    if(i != activeRow) {
-      freq_pixels.setPixelColor(savedVals[i], freq_pixels.Color(0, 0, 50));
-    }
-    delay(10);
-  }*/
   
   freq_pixels.show();
   activity_pixels.show();
