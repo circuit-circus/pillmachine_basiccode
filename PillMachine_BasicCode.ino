@@ -32,15 +32,15 @@ moja & circuitcircus
 #endif
 #include <ResponsiveAnalogRead.h>
 
-#define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
+#define maskinNR 2 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
 #define SS_PIN 8 // SDA for RFID
 #define RST_PIN 9 // RST
 #define pausetid 10
-#define RFIDLED 2 // LEDLIGHT BEHIND RFID TAG ---- brug pin 0 eller 1 i endelig version
+#define RFIDLED 4 // LEDLIGHT BEHIND RFID TAG ---- brug pin 0 eller 1 i endelig version
 
 static uint8_t mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF };
-static uint8_t myip[] = {  10, 0, 0, 100 };
+static uint8_t myip[] = {  10, 0, 0, 102 };
 IPAddress pc_server(10,0,0,31);  // serverens adress
 
 boolean cardPresent = false; // DEBUG: Set this and isDebugging to true to test UI
@@ -111,15 +111,15 @@ void setup() {
   mfrc522.PCD_SetRegisterBitMask(mfrc522.RFCfgReg, (0x07<<4)); // Enhance the MFRC522 Receiver Gain to maximum value of some 48 dB
   pinMode(RFIDLED, OUTPUT);
   Ethernet.begin(mac, myip);
+
+  freq_pixels.begin(); // This initializes the NeoPixel library.
+  activity_pixels.begin(); // This initializes the NeoPixel library.
+  turnOffLeds();
+
   delay(5000); // wait for ethernetcard
   aktivateEthernetSPI(false);
 
   // Machine individual setups go here
-  freq_pixels.begin(); // This initializes the NeoPixel library.
-  activity_pixels.begin(); // This initializes the NeoPixel library.
-
-  freq_pixels.clear();
-  activity_pixels.clear();
 
   pinMode(encoderPin1, INPUT);
   pinMode(encoderPin2, INPUT);
@@ -232,12 +232,13 @@ void aktivateEthernetSPI(boolean x) {
 void resetData() {
   userval="";
   // Reset your variables here
-  freq_pixels.clear();
-  activity_pixels.clear();
+  turnOffLeds();
+
   for(int i = 0; i < NO_OF_ROWS; i++) {
     savedVals[i] = "";
     savedEncoderVals[i] = "";
   }
+
   activeRow = 0;
   lastActiveRow = -1;
   activeColumn = 0;
@@ -250,7 +251,6 @@ void UI() {
   * pwm output = D3, D5, D5
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
-
   if(userval == "") {
     freq_pixels.clear();
     activity_pixels.clear();
@@ -261,7 +261,7 @@ void UI() {
   // Slider is wired in reverse, so we must subtract from NO_OF_ROWS
   activeRow = NO_OF_ROWS - map(sliderVal, 0, 1024, 0, NO_OF_ROWS) - 1;
 
-  if(activeRow != lastActiveRow) { // If we have changed rows
+  if(activeRow != lastActiveRow && userval != "") { // If we have changed rows
     // Saving the values for later
     savedVals[lastActiveRow] = pixelMatrix[lastActiveRow][activeColumn];
     savedEncoderVals[lastActiveRow] = encoderValue;
@@ -357,4 +357,12 @@ void updateEncoder() {
   lastEncoded = encoded; //store this value for next time
 
   encoderValue = constrain(encoderValue, 0, mapSensitivity);
+}
+
+void turnOffLeds() {
+  freq_pixels.clear();
+  activity_pixels.clear();
+
+  freq_pixels.show();
+  activity_pixels.show();
 }
