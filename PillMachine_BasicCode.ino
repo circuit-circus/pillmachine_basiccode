@@ -70,7 +70,7 @@ EthernetClient client;
 #define LENGTH 6
 
 const int buttonPins[LENGTH] = {A0, A1, A2, A3, A4, A5};
-int buttonStates[LENGTH];
+int buttonStates[LENGTH] = {LOW, LOW, LOW, LOW, LOW, LOW};
 int lastButtonStates[LENGTH] = {LOW, LOW, LOW, LOW, LOW, LOW};
 
 unsigned long lastDebounceTimes[LENGTH] = {0, 0, 0, 0, 0, 0};
@@ -210,6 +210,16 @@ void aktivateEthernetSPI(boolean x) {
 void resetData() {
   userval = "";
   // Reset your variables here
+
+  for(int i = 0; i < LENGTH; i++) {
+    buttonStates[i] = LOW;
+    lastButtonStates[i] = LOW;
+    lastDebounceTimes[i] = 0;
+    ledStates[i] = LOW;
+  }
+
+  leds.clear();
+  leds.show();
 }
 
 // this is where the user interface is responsive
