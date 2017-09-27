@@ -76,7 +76,7 @@ unsigned long lastDebounceTimes[LENGTH] = {0, 0, 0, 0, 0, 0};
 unsigned long debounceDelay = 50;
 
 const int numberOfLeds = 6;
-const int ledPin = 9;
+const int ledPin = 6;
 int ledStates[LENGTH] = {LOW, LOW, LOW, LOW, LOW, LOW};
 
 
@@ -96,6 +96,7 @@ void setup() {
   
   // Initiate LEDs
   leds.begin();
+  leds.clear();
   leds.show();
 
   // Set pinMode on buttons
@@ -108,6 +109,7 @@ void setup() {
 
 void loop() {
   digitalWrite(RFIDLED, cardPresent);
+
 
   if (cardPresent) {
     // KEEP THE UI responsive-------------------her foregår alt med UI
@@ -212,13 +214,13 @@ void resetData() {
 // this is where the user interface is responsive
 void UI() {
  
-
   // Read buttonstates - using the debounce method (see Arduino examples --> 02. Digital --> Debounce)
   for (int i = 0; i < LENGTH; i++) {
     int reading = digitalRead(buttonPins[i]);
     if(reading != lastButtonStates[i]) {
       lastDebounceTimes[i] = millis();
     }
+
 
     if((millis() - lastDebounceTimes[i]) > debounceDelay) {
       if(reading != buttonStates[i]) {
@@ -234,9 +236,9 @@ void UI() {
     uint32_t c = ledStates[i] == HIGH ? leds.Color(150, 150, 150) : leds.Color(0, 0, 0);
     leds.setPixelColor(i, c);
     leds.show();
-    delay(50);
 
     lastButtonStates[i] = reading;
+
 
   }
 
