@@ -96,6 +96,8 @@ void setup() {
 
   // Machine individual setups go here
   strip.begin();
+  strip.clear();
+  strip.show();
 }
 
 void loop() {
@@ -197,6 +199,11 @@ void aktivateEthernetSPI(boolean x) {
 void resetData() {
   userval="";
   // Reset your variables here
+
+  strip.clear();
+  strip.show();
+
+  
 }
 
 // this is where the user interface is responsive
