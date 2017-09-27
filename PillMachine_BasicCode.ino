@@ -28,7 +28,7 @@ moja & circuitcircus
 // Define machine individual includes here
 
 
-#define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
+#define maskinNR 8 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
 #define SS_PIN 8 // SDA for RFID
 #define RST_PIN 9 // RST
@@ -36,7 +36,7 @@ moja & circuitcircus
 #define RFIDLED 2 // LEDLIGHT BEHIND RFID TAG ---- brug pin 0 eller 1 i endelig version
 
 static uint8_t mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF };
-static uint8_t myip[] = {  10, 0, 0, 100 };
+static uint8_t myip[] = {  10, 0, 0, 108};
 IPAddress pc_server(10,0,0,31);  // serverens adress
 
 boolean cardPresent = false; // DEBUG: Set this and isDebugging to true to test UI
@@ -176,6 +176,8 @@ void resetData() {
   userval="";
   // Reset your variables here
   activeLed = 0;
+  digitalWrite(noLed, LOW);
+  digitalWrite(yesLed, LOW);
 }
 
 // this is where the user interface is responsive
