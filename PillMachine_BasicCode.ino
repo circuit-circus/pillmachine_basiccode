@@ -168,11 +168,9 @@ void submitData(String val) {
     //String datastring= "GET /arduino.php?val="+String(val)+" HTTP/1.0";
 
     // IF DEV:
-    String datastring="GET /DEV/pillmachine/machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
+    //String datastring="GET /DEV/pillmachine/machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
     // IF PRODUCTION:
-    // String datastring="GET /machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
-
-    Serial.println(datastring);
+    String datastring="GET /machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
 
     if(client.connect(pc_server,80)) {
       client.println(datastring);
@@ -217,7 +215,7 @@ void UI() {
   int hue = map(huePotVal, 0, 1024, 0, 767);
 
   // Map saturation from 150 to 254 - doing 0 to 254 makes it white for a large part of the potentiometer "rotation", we don't want that
-  int saturation = map(satPotVal, 0, 1024, 150, 254);
+  int saturation = map(satPotVal, 0, 1024, 100, 254);
 
   if(isDebugging) {
     Serial.print("HUE POT : ");
@@ -244,7 +242,11 @@ void UI() {
 
   gradientCentered(strip.Color(red, green, blue), strip.Color(red + 50, green + 50, blue + 50));
 
-  userval = String(hue, DEC) + "," + String(saturation, DEC);
+
+  int hueToSend = map(huePotVal, 0, 1024, 0, 255);
+  int satToSend = map(satPotVal, 0, 1024, 0, 255);
+  userval = String(hueToSend, DEC) + "," + String(satToSend, DEC);
+
 }
 
 // Custom functions for individual machines go here
