@@ -58,12 +58,13 @@ EthernetClient client;
  * This is the Layout that both LEDs and Buttons follow
  * 
  *        -------
- *   3 o -       - o 2
+ *   2 o -       - o 3
  *       |       |  
- *   4 o -       - o 1
+ *   1 o -       - o 4
  *       |       |
- *   5 o -       - o 0
- * 
+ *   0 o -       - o 5
+ *         ....
+ *        PINS IN
 */
 
 #define LENGTH 6
@@ -178,9 +179,9 @@ void submitData(String val) {
     //String datastring= "GET /arduino.php?val="+String(val)+" HTTP/1.0";
 
     // IF DEV:
-    String datastring = "GET /DEV/pillmachine/machine//setval.php?tag=" + String(cardID) + "&maskine=" + String(maskinNR) + "&val=" + val + " HTTP/1.0";
+    // String datastring = "GET /DEV/pillmachine/machine//setval.php?tag=" + String(cardID) + "&maskine=" + String(maskinNR) + "&val=" + val + " HTTP/1.0";
     // IF PRODUCTION:
-    // String datastring="GET /machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
+    String datastring="GET /machine//setval.php?tag="+String(cardID)+"&maskine="+String(maskinNR)+"&val="+val+" HTTP/1.0";
 
     Serial.println(datastring);
 
