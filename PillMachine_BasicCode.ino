@@ -261,7 +261,7 @@ void UI() {
   // Slider is wired in reverse, so we must subtract from NO_OF_ROWS
   activeRow = NO_OF_ROWS - map(sliderVal, 0, 1024, 0, NO_OF_ROWS) - 1;
 
-  if(activeRow != lastActiveRow && userval != "") { // If we have changed rows and we haven't just started
+  if(/*activeRow != lastActiveRow && */userval != "") { // If we have changed rows and we haven't just started
     // Saving the values for later
     savedVals[lastActiveRow] = pixelMatrix[lastActiveRow][activeColumn];
     savedEncoderVals[lastActiveRow] = encoderValue;
@@ -284,7 +284,7 @@ void UI() {
         freq_pixels.setPixelColor(i, freq_pixels.Color(0, 0, 0));
       }
       else {
-        freq_pixels.setPixelColor(i, freq_pixels.Color(0, 0, 50));
+        freq_pixels.setPixelColor(i, freq_pixels.Color(10, 10, 10));
       }
     }
   }
@@ -364,8 +364,6 @@ void updateEncoder() {
   lastEncoded = encoded; //store this value for next time
 
   encoderValue = constrain(encoderValue, 0, mapSensitivity);
-
-
 }
 
 void turnOffLeds() {
