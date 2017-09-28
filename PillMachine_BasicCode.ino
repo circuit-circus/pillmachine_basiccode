@@ -218,8 +218,8 @@ void UI() {
   satPotVal = analogRead(satPotPin);
  
 
-  // Map hue from 0 to 767 (what the hsb2rgb takes as max) - Start at 20 because then start and end is not the exact same red color
-  int hue = map(huePotVal, 0, 1024, 20, 767);
+  // Map hue from 0 to 767 (what the hsb2rgb takes as max) - Start at 30 because then start and end is not the exact same red color
+  int hue = map(huePotVal, 0, 1024, 30, 767);
 
   // Map saturation from 150 to 254 - doing 0 to 254 makes it white for a large part of the potentiometer "rotation", we don't want that
   int saturation = map(satPotVal, 0, 1024, 254, 150);
@@ -239,14 +239,13 @@ void UI() {
 
   }
 
+  hsb2rgb(hue, saturation, 40); // Updates the stripColor value to match
 
-  hsb2rgb(hue, saturation, 50); // Updates the stripColor value to match
-
+  for(int i = 0; i < NUMPIXELS; i++) {
+    strip.setPixelColor(i, strip.Color(red, green, blue)); // Moderately bright green color.
+    strip.show(); // This sends the updated pixel color to the hardware.
+  }
   
-
-  gradientCentered(strip.Color(red, green, blue), strip.Color(red + 50, green + 50, blue + 50));
-
-
   int hueToSend = map(huePotVal, 0, 1024, 0, 255);
   int satToSend = map(satPotVal, 0, 1024, 0, 255);
   userval = String(hueToSend, DEC) + "," + String(satToSend, DEC);
@@ -304,20 +303,6 @@ void hsb2rgb(uint16_t hue, uint8_t sat, uint8_t bright) {
   blue = (uint8_t)b_temp;
 
 }
-
-
-void gradient(uint32_t Color1, uint32_t Color2) {
-  int totalSteps = strip.numPixels();
-  for (int i = 0; i < totalSteps; i++) {
-    red = ((Red(Color1) * (totalSteps - i)) + (Red(Color2) * i)) / totalSteps;
-    green = ((Green(Color1) * (totalSteps - i)) + (Green(Color2) * i)) / totalSteps;
-    blue = ((Blue(Color1) * (totalSteps - i)) + (Blue(Color2) * i)) / totalSteps;
-    
-    strip.setPixelColor(i, strip.Color(red, green, blue));
-  }
-  strip.show();
-}
-
 
 
 void gradientCentered(uint32_t Color1, uint32_t Color2) {
