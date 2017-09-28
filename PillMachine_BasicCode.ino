@@ -191,7 +191,7 @@ void UI() {
   FastLED.show();
 
   potVal = analogRead(potPin);
-  userval = "" + map(potVal, 0, 1023, 0, 255);
+  userval = String(map(potVal, 0, 1023, 0, 255));
   potVal = map(potVal, 0, 1024, 1211, 1644);
   myservo.writeMicroseconds(potVal);
 
