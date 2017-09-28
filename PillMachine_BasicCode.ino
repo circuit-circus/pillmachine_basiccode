@@ -218,11 +218,11 @@ void UI() {
   satPotVal = analogRead(satPotPin);
  
 
-  // Map hue from 0 to 767 (what the hsb2rgb takes as max)
-  int hue = map(huePotVal, 0, 1024, 0, 767);
+  // Map hue from 0 to 767 (what the hsb2rgb takes as max) - Start at 20 because then start and end is not the exact same red color
+  int hue = map(huePotVal, 0, 1024, 20, 767);
 
   // Map saturation from 150 to 254 - doing 0 to 254 makes it white for a large part of the potentiometer "rotation", we don't want that
-  int saturation = map(satPotVal, 0, 1024, 100, 254);
+  int saturation = map(satPotVal, 0, 1024, 254, 150);
 
   if(isDebugging) {
     Serial.print("HUE POT : ");
@@ -239,13 +239,10 @@ void UI() {
 
   }
 
-  if(brightness <= 150 || brightness >= 240) {
-    brightnessModifier *= -1;
-  }
 
-  brightness += brightnessModifier;
+  hsb2rgb(hue, saturation, 50); // Updates the stripColor value to match
 
-  hsb2rgb(hue, saturation, 100); // Updates the stripColor value to match
+  
 
   gradientCentered(strip.Color(red, green, blue), strip.Color(red + 50, green + 50, blue + 50));
 
@@ -305,6 +302,7 @@ void hsb2rgb(uint16_t hue, uint8_t sat, uint8_t bright) {
   red = (uint8_t)r_temp;
   green = (uint8_t)g_temp;
   blue = (uint8_t)b_temp;
+
 }
 
 
@@ -323,8 +321,6 @@ void gradient(uint32_t Color1, uint32_t Color2) {
 
 
 void gradientCentered(uint32_t Color1, uint32_t Color2) {
-
-
   int totalSteps = 3;
   for (int i = 0; i < totalSteps; i++) {
     red = ((Red(Color1) * (totalSteps - i)) + (Red(Color2) * i)) / totalSteps;
