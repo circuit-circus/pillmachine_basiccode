@@ -101,8 +101,8 @@ int pixelMatrix[8][5] = {
   {35, 36, 37, 38, 39}
 };
 
-int savedVals[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-int savedEncoderVals[8] = {"", "", "", "", "", "", "", ""};
+int savedVals[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+int savedEncoderVals[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 void setup() {
   Serial.begin(9600);
@@ -235,8 +235,8 @@ void resetData() {
   turnOffLeds();
 
   for(int i = 0; i < NO_OF_ROWS; i++) {
-    savedVals[i] = "";
-    savedEncoderVals[i] = "";
+    savedVals[i] = -1;
+    savedEncoderVals[i] = -1;
   }
 
   activeRow = 0;
@@ -251,7 +251,7 @@ void UI() {
   * pwm output = D3, D5, D5
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
-  if(userval == 0) {
+  if(userval == "") {
     freq_pixels.clear();
     activity_pixels.clear();
   }
@@ -261,13 +261,13 @@ void UI() {
   // Slider is wired in reverse, so we must subtract from NO_OF_ROWS
   activeRow = NO_OF_ROWS - map(sliderVal, 0, 1024, 0, NO_OF_ROWS) - 1;
 
-  if(activeRow != lastActiveRow && userval != 0) { // If we have changed rows and we haven't just started
+  if(activeRow != lastActiveRow && userval != "") { // If we have changed rows and we haven't just started
     // Saving the values for later
     savedVals[lastActiveRow] = pixelMatrix[lastActiveRow][activeColumn];
     savedEncoderVals[lastActiveRow] = encoderValue;
 
     // If we already have a saved value, jump to that
-    if(savedVals[activeRow] != 0) {
+    if(savedVals[activeRow] != -1) {
       activeColumn = savedVals[activeRow];
       encoderValue = savedEncoderVals[activeRow];
     }
@@ -333,11 +333,11 @@ void UI() {
   userval = "";
   for(int l = 0; l < NO_OF_ROWS; l++) {
     // Make sure number is between 0 and 4
-    if(savedVals[l] % 5 == 0) {
+    if(savedVals[l] == -1) {
       userval += 0;
     }
     else {
-      userval += (savedVals[l] % 5);
+      userval += (savedVals[l] % 5) + 1;
     }
     // Add a comma for all except the final row
     if(l != NO_OF_ROWS - 1) {
@@ -364,6 +364,8 @@ void updateEncoder() {
   lastEncoded = encoded; //store this value for next time
 
   encoderValue = constrain(encoderValue, 0, mapSensitivity);
+
+
 }
 
 void turnOffLeds() {
