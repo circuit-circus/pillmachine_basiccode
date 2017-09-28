@@ -29,7 +29,7 @@
 #include <Adafruit_NeoPixel.h>
 
 
-#define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
+#define maskinNR 5 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
 #define SS_PIN 8 // SDA for RFID
 #define RST_PIN 9 // RST
@@ -37,7 +37,7 @@
 #define RFIDLED 2 // LEDLIGHT BEHIND RFID TAG ---- brug pin 0 eller 1 i endelig version
 
 static uint8_t mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF };
-static uint8_t myip[] = {  10, 0, 0, 100 };
+static uint8_t myip[] = {  10, 0, 0, 105 };
 IPAddress pc_server(10, 0, 0, 31); // serverens adress
 
 boolean cardPresent = false; // DEBUG: Set this and isDebugging to true to test UI
@@ -228,6 +228,7 @@ void UI() {
   // Read buttonstates - using the debounce method (see Arduino examples --> 02. Digital --> Debounce)
   for (int i = 0; i < LENGTH; i++) {
     int reading = digitalRead(buttonPins[i]);
+
     if(reading != lastButtonStates[i]) {
       lastDebounceTimes[i] = millis();
     }
@@ -252,6 +253,7 @@ void UI() {
 
 
   }
+
 
   userval = String(ledStates[0], DEC) + "," + String(ledStates[1], DEC) + "," + String(ledStates[2], DEC) + "," + String(ledStates[3], DEC) + "," + String(ledStates[4], DEC) + "," + String(ledStates[5], DEC);
   
