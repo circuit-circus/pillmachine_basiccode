@@ -69,7 +69,7 @@ EthernetClient client;
 
 #define LENGTH 6
 
-const int buttonPins[LENGTH] = {A0, A1, A2, A3, A4, A5};
+const int buttonPins[LENGTH] = {4, 5, A2, A3, A4, A5};
 int buttonStates[LENGTH] = {LOW, LOW, LOW, LOW, LOW, LOW};
 int lastButtonStates[LENGTH] = {LOW, LOW, LOW, LOW, LOW, LOW};
 
@@ -228,6 +228,12 @@ void UI() {
   // Read buttonstates - using the debounce method (see Arduino examples --> 02. Digital --> Debounce)
   for (int i = 0; i < LENGTH; i++) {
     int reading = digitalRead(buttonPins[i]);
+
+    if(isDebugging) {
+      Serial.print(i);
+      Serial.print(": ");
+      Serial.println(reading);
+    }
 
     if(reading != lastButtonStates[i]) {
       lastDebounceTimes[i] = millis();
