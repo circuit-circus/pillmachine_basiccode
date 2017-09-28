@@ -261,7 +261,7 @@ void UI() {
   // Slider is wired in reverse, so we must subtract from NO_OF_ROWS
   activeRow = NO_OF_ROWS - map(sliderVal, 0, 1024, 0, NO_OF_ROWS) - 1;
 
-  if(/*activeRow != lastActiveRow && */userval != "") { // If we have changed rows and we haven't just started
+  if(userval != "") { // If we haven't just started
     // Saving the values for later
     savedVals[lastActiveRow] = pixelMatrix[lastActiveRow][activeColumn];
     savedEncoderVals[lastActiveRow] = encoderValue;
@@ -344,8 +344,6 @@ void UI() {
       userval += ",";
     }
   }
-
-  Serial.println(userval);
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
