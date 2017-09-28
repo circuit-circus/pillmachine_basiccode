@@ -284,7 +284,7 @@ void UI() {
         freq_pixels.setPixelColor(i, freq_pixels.Color(0, 0, 0));
       }
       else {
-        freq_pixels.setPixelColor(i, freq_pixels.Color(10, 10, 10));
+        freq_pixels.setPixelColor(i, freq_pixels.Color(2, 2, 2));
       }
     }
   }
