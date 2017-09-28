@@ -88,6 +88,7 @@ int mapSensitivity = 34;
 int activeColumn = 0;
 
 unsigned long previousBlinkMillis = 0;
+long blinkLength = 500;
 int blinkLedState = LOW;
 
 int pixelMatrix[8][5] = {
@@ -129,6 +130,8 @@ void setup() {
 
   attachInterrupt(0, updateEncoder, CHANGE);
   attachInterrupt(1, updateEncoder, CHANGE);
+
+  turnOffLeds();
 }
 
 void loop() {
@@ -302,7 +305,7 @@ void UI() {
       // Blink LED
       unsigned long currentMillis = millis();
 
-      if (currentMillis - previousBlinkMillis >= 700) {
+      if (currentMillis - previousBlinkMillis >= blinkLength) {
         previousBlinkMillis = currentMillis;
 
         if(blinkLedState == LOW) {
@@ -367,7 +370,8 @@ void updateEncoder() {
 void turnOffLeds() {
   freq_pixels.clear();
   activity_pixels.clear();
-
+  delay(500);
   freq_pixels.show();
   activity_pixels.show();
+  delay(500);
 }
