@@ -54,7 +54,7 @@ EthernetClient client;
 // Define machine individual variables here
 Servo myservo;
 int potVal;
-int potPin = 0;
+int potPin = 3;
 int servoPin = A1;
 #define LEDPIN 5
 #define NUM_LEDS 1
