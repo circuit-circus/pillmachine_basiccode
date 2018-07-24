@@ -250,7 +250,7 @@ void UI() {
     }
 
     // Set LEDs accordingly
-    uint32_t c = ledStates[i] == HIGH ? leds.Color(150, 150, 150) : leds.Color(0, 0, 0);
+    uint32_t c = ledStates[i] == HIGH ? leds.Color(45, 45, 45) : leds.Color(0, 0, 0);
     leds.setPixelColor(i, c);
     leds.show();
 
