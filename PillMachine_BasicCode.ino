@@ -26,9 +26,9 @@ moja & circuitcircus
 #include <MFRC522.h>
 #include <Ethernet.h>
 // Define machine individual includes here
+#include <Adafruit_PWMServoDriver.h>
 
-
-#define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
+#define maskinNR 7 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
 #define SS_PIN 8 // SDA for RFID
 #define RST_PIN 9 // RST
@@ -51,6 +51,25 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 EthernetClient client;
 
 // Define machine individual variables here
+//use I2C to communicate, 2 pins are required to  interface. For Arduino UNOs, thats SCL -> Analog 5, SDA -> Analog 4
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+
+#define curvMundStraight 300
+#define curvBrowStraight 310
+#define curvMin 200
+#define curvMax 400
+
+#define mundRight 4
+#define mundLeft 8
+#define browRight 0
+#define browLeft 1
+
+#define BELYSNING 3
+#define pinOE 7
+
+int potMundOld = 300;
+int potBrowOld = 300;
+const int threshold = 5;
 
 void setup() {
   Serial.begin(9600);
@@ -63,6 +82,13 @@ void setup() {
   aktivateEthernetSPI(false);
 
   // Machine individual setups go here
+  pinMode(BELYSNING, OUTPUT);
+  pinMode(pinOE, OUTPUT);
+
+  pwm.begin();
+  pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updat
+  resetFace();
+  delay(5000);
 }
 
 void loop() {
@@ -166,6 +192,8 @@ void aktivateEthernetSPI(boolean x) {
 void resetData() {
   userval="";
   // Reset your variables here
+  digitalWrite(BELYSNING, LOW);
+  resetFace();
 }
 
 // this is where the user interface is responsive
@@ -175,9 +203,48 @@ void UI() {
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
 
-  userval="28,96,57,70";
-
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
+  enableFace(HIGH);
+
+  digitalWrite(BELYSNING, HIGH);
+
+  //-------------------MUND
+  int potMund = analogRead(A0);
+
+  int uservala = map(potMund, 0, 1023, 0, 255);
+
+  if(abs(potMund - potMundOld) > threshold) {
+    pwm.setPWM(mundRight, 0, map(potMund, 0, 1023, curvMin, curvMax));
+    pwm.setPWM(mundLeft, 0, map(potMund, 0, 1023, curvMax, curvMin));
+    potMundOld = potMund;
+  }
+
+  //-------------------BROW
+  int potBrow = analogRead(A1);
+  int uservalB = map(potBrow, 0, 1023, 0, 255);
+
+  if(abs(potBrow - potBrowOld) > threshold) {
+    pwm.setPWM(browRight, 0, map(potBrow, 0, 1023, curvMin, curvMax));
+    pwm.setPWM(browLeft, 0, map(potBrow, 0, 1023, curvMax, curvMin));
+    potBrowOld = potBrow;
+  }
+
+  userval = String(uservala, DEC) + "," + String(uservalB, DEC);
+  delay(20);
 }
 
 // Custom functions for individual machines go here
+void resetFace(){
+  pwm.setPWM(mundRight, 0, curvMundStraight);
+  pwm.setPWM(mundLeft, 0, curvMundStraight);
+  delay(500); // for at undgå at alle motorer kører samtidigt
+  pwm.setPWM(browRight, 0, curvBrowStraight);
+  pwm.setPWM(browLeft, 0, curvBrowStraight);
+
+  delay(1000);
+  enableFace(LOW);
+}
+
+void enableFace(boolean OE) {
+  digitalWrite(pinOE, !OE);
+}
