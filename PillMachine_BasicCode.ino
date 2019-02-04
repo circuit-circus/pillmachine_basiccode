@@ -36,7 +36,7 @@ moja & circuitcircus
 #define RFIDLED 2 // LEDLIGHT BEHIND RFID TAG ---- brug pin 0 eller 1 i endelig version
 
 static uint8_t mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF };
-static uint8_t myip[] = {  10, 0, 0, 100 };
+static uint8_t myip[] = {  10, 0, 0, 107 };
 IPAddress pc_server(10,0,0,31);  // serverens adress
 
 boolean cardPresent = false; // DEBUG: Set this and isDebugging to true to test UI
