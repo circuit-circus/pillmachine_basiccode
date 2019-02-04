@@ -26,9 +26,9 @@ moja & circuitcircus
 #include <MFRC522.h>
 #include <Ethernet.h>
 // Define machine individual includes here
+#include <ResponsiveAnalogRead.h>
 
-
-#define maskinNR 1 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
+#define maskinNR 3 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
 #define SS_PIN 8 // SDA for RFID
 #define RST_PIN 9 // RST
@@ -36,7 +36,7 @@ moja & circuitcircus
 #define RFIDLED 2 // LEDLIGHT BEHIND RFID TAG ---- brug pin 0 eller 1 i endelig version
 
 static uint8_t mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF };
-static uint8_t myip[] = {  10, 0, 0, 100 };
+static uint8_t myip[] = {  10, 0, 0, 103 };
 IPAddress pc_server(10,0,0,31);  // serverens adress
 
 boolean cardPresent = false; // DEBUG: Set this and isDebugging to true to test UI
@@ -51,6 +51,14 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 EthernetClient client;
 
 // Define machine individual variables here
+#define treshold 5.0
+#define meter_1_Pin 5
+#define meter_2_Pin 6
+
+int val_1, val_2 = 0;
+
+ResponsiveAnalogRead knob_1(A0, true);
+ResponsiveAnalogRead knob_2(A1, true);
 
 void setup() {
   Serial.begin(9600);
@@ -63,6 +71,11 @@ void setup() {
   aktivateEthernetSPI(false);
 
   // Machine individual setups go here
+  pinMode(meter_1_Pin, OUTPUT);
+  pinMode(meter_2_Pin, OUTPUT);
+
+  knob_1.setActivityThreshold(treshold);
+  knob_2.setActivityThreshold(treshold);
 }
 
 void loop() {
@@ -166,6 +179,8 @@ void aktivateEthernetSPI(boolean x) {
 void resetData() {
   userval="";
   // Reset your variables here
+  analogWrite(meter_1_Pin, 0);
+  analogWrite(meter_2_Pin, 0);
 }
 
 // this is where the user interface is responsive
@@ -175,9 +190,25 @@ void UI() {
   * digital I/O = D0, D1, D4 + (D3, D5, D5)
   */
 
-  userval="28,96,57,70";
-
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
+  // update the ResponsiveAnalogRead objects every loop
+  knob_1.update();
+  knob_2.update();
+
+  if(knob_1.hasChanged()) {
+    val_1 = knob_1.getValue();
+    val_1 = map(val_1, 0, 1023, 0, 255);
+    analogWrite(meter_1_Pin, val_1);
+    userval = String(val_1, DEC) + "," + String(val_2, DEC);
+    //Serial.println(userval);
+  }
+
+  if(knob_2.hasChanged()) {
+    val_2 = knob_2.getValue();
+    val_2 = map(val_2, 0, 1023, 255, 0); //omvendt
+    analogWrite(meter_2_Pin, val_2);
+    userval = String(val_1, DEC) + "," + String(val_2, DEC);
+  }
 }
 
 // Custom functions for individual machines go here
