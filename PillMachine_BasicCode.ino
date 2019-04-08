@@ -310,7 +310,7 @@ void UI() {
 
         if(blinkLedState == LOW) {
           blinkLedState = HIGH;
-          activity_pixels.setPixelColor(j, activity_pixels.Color(50, 50, 50));
+          activity_pixels.setPixelColor(j, activity_pixels.Color(25, 25, 25));
         } else {
           blinkLedState = LOW;
           activity_pixels.setPixelColor(j, activity_pixels.Color(0, 0, 0));
@@ -326,7 +326,7 @@ void UI() {
       freq_pixels.setPixelColor(k, freq_pixels.Color(0, 0, 0));
     }
     else {
-      freq_pixels.setPixelColor(k, freq_pixels.Color(50, 50, 50));
+      freq_pixels.setPixelColor(k, freq_pixels.Color(25, 25, 25));
     }
   }
   
