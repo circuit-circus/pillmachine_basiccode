@@ -29,7 +29,7 @@ moja & circuitcircus
 #include <Servo.h>
 #include <FastLED.h>
 
-#define maskinNR 9 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
+#define maskinNR 4 //FOR AT VI VED HVILKEN STATION DER SUBMITTER
 
 #define SS_PIN 8 // SDA for RFID
 #define RST_PIN 9 // RST
