@@ -59,6 +59,10 @@ int servoPin = A1;
 #define LEDPIN 5
 #define NUM_LEDS 1
 CRGB leds[NUM_LEDS];
+const int minServoPos = 55;
+const int maxServoPos = 110;
+
+int lastServoVal = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -190,12 +194,20 @@ void UI() {
   leds[0] = CRGB::White;
   FastLED.show();
 
-  potVal = analogRead(potPin);
+  stabilizePot();
   userval = String(map(potVal, 0, 1023, 0, 255));
-  potVal = map(potVal, 0, 1024, 1211, 1644);
-  myservo.writeMicroseconds(potVal);
+  potVal = map(potVal, 0, 1024, minServoPos, maxServoPos);
+  myservo.write(potVal);
 
   // HUSK AT SÆTTE userval="" HVIS MASKINEN IKKE ER SAT TIL NOGET
 }
 
 // Custom functions for individual machines go here
+void stabilizePot() {
+  potVal = int(lerp(float(lastServoVal), float(analogRead(potPin)), 0.1f));
+  lastServoVal = potVal;
+}
+
+float lerp(float start, float stop, float amt) {
+  return amt * (stop - start) + start;
+}
