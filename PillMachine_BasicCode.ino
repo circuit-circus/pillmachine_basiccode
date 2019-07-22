@@ -71,6 +71,11 @@ int potMundOld = 300;
 int potBrowOld = 300;
 const int threshold = 5;
 
+int potMundGlobe = 0;
+int potBrowGlobe = 0;
+int lastPotMundGlobe = 0;
+int lastPotBrowGlobe = 0;
+
 void setup() {
   Serial.begin(9600);
   SPI.begin();
@@ -208,8 +213,10 @@ void UI() {
 
   digitalWrite(BELYSNING, HIGH);
 
+  stabilizePot();
+
   //-------------------MUND
-  int potMund = analogRead(A0);
+  int potMund = potMundGlobe;
 
   int uservala = map(potMund, 0, 1023, 0, 255);
 
@@ -220,7 +227,7 @@ void UI() {
   }
 
   //-------------------BROW
-  int potBrow = analogRead(A1);
+  int potBrow = potBrowGlobe;
   int uservalB = map(potBrow, 0, 1023, 0, 255);
 
   if(abs(potBrow - potBrowOld) > threshold) {
@@ -247,4 +254,16 @@ void resetFace(){
 
 void enableFace(boolean OE) {
   digitalWrite(pinOE, !OE);
+}
+
+void stabilizePot() {
+  potMundGlobe = int(lerp(float(lastPotMundGlobe), float(analogRead(A0)), 0.1f));
+  lastPotMundGlobe = potMundGlobe;
+
+  potBrowGlobe = int(lerp(float(lastPotBrowGlobe), float(analogRead(A1)), 0.1f));
+  lastPotBrowGlobe = potBrowGlobe;
+}
+
+float lerp(float start, float stop, float amt) {
+  return amt * (stop - start) + start;
 }
