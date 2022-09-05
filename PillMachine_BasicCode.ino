@@ -83,7 +83,7 @@ volatile int lastEncoded = 0;
 volatile long encoderValue = 0;
 
 // How big steps should the encoder move the LED columns in?
-int mapSensitivity = 34;
+int mapSensitivity = 68;
 
 int activeColumn = 0;
 
