@@ -85,7 +85,7 @@ volatile long encoderValue = 0;
 // How sensitive should the encoder be to moving the LED columns?
 // Big numbers mean less sensitive, which may result in no movement
 // Small numbers mean more sensitive, which may result in erratic/wrong movement
-int mapSensitivity = 46;
+int mapSensitivity = 42;
 
 int activeColumn = 0;
 
@@ -367,6 +367,8 @@ void updateEncoder() {
   lastEncoded = encoded; //store this value for next time
 
   encoderValue = constrain(encoderValue, 0, mapSensitivity);
+  // Printing to serial seems to stabilize the encoder, so next line is crucial!
+  Serial.println(encoderValue);
 }
 
 void turnOffLeds() {
