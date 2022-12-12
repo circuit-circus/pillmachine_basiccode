@@ -85,7 +85,7 @@ volatile long encoderValue = 0;
 // How sensitive should the encoder be to moving the LED columns?
 // Big numbers mean less sensitive, which may result in no movement
 // Small numbers mean more sensitive, which may result in erratic/wrong movement
-int mapSensitivity = 42;
+int mapSensitivity = 36;
 
 int activeColumn = 0;
 
